@@ -1,0 +1,77 @@
+/* Global enhancements to complement Tailwind */
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Subtle gradient app background you can apply with className="app-bg" */
+.app-bg {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%, #eef2ff 100%);
+}
+
+.dark .app-bg {
+  background: linear-gradient(180deg, #1f2937 0%, #111827 40%, #0f172a 100%);
+}
+
+/* Glassy card look if needed */
+.card-glass {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1rem;
+}
+
+.dark .card-glass {
+  background: rgba(31, 41, 55, 0.9);
+  border: 1px solid rgba(75, 85, 99, 0.8);
+}
+
+/* Smooth scrolling and nicer scrollbar */
+html {
+  scroll-behavior: smooth;
+}
+
+/***** Optional: soft scrollbar *****/
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Tables: subtle borders */
+.table-soft th,
+.table-soft td {
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .table-soft th,
+.dark .table-soft td {
+  border-top: 1px solid #374151;
+}
+
+/* Inputs: light focus ring helper for non-TW inputs */
+.input-soft:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+}
+
+.dark .input-soft:focus {
+  outline: 2px solid #60a5fa;
+}
