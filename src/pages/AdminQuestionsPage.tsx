@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { questionService } from '../services/questionService';
@@ -56,7 +56,7 @@ export default function AdminQuestionsPage() {
     }
 
     try {
-      const updatedQuestion = await questionService.updateQuestion(id, form);
+      const updatedQuestion = await questionService.updateQuestion({ id, ...form });
       setQuestions(prev => prev.map(q => q.id === id ? updatedQuestion : q));
       setEditingId(null);
       setForm({ text: '', options: ['', '', '', ''], answerIndex: 0 });

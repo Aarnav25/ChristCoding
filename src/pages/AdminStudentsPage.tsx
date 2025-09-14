@@ -38,18 +38,27 @@ export default function AdminStudentsPage() {
     if (attempts.length === 0) return null;
 
     const totalAttempts = attempts.length;
+    
+    // Calculate average percentage score (not raw score)
+    const averagePercentage = attempts.reduce((sum, attempt) => {
+      return sum + (attempt.score / attempt.total) * 100;
+    }, 0) / totalAttempts;
+    
+    // Calculate best percentage score
+    const bestPercentage = Math.max(...attempts.map(a => (a.score / a.total) * 100));
+    
+    // Calculate overall accuracy (total correct / total possible)
     const totalScore = attempts.reduce((sum, attempt) => sum + attempt.score, 0);
     const totalPossible = attempts.reduce((sum, attempt) => sum + attempt.total, 0);
-    const averageScore = totalScore / totalAttempts;
-    const bestScore = Math.max(...attempts.map(a => a.score));
     const accuracy = totalPossible > 0 ? (totalScore / totalPossible) * 100 : 0;
+    
     const lastAttempt = attempts[0]?.taken_at || '';
 
     return {
       email: attempts[0]?.student_email || '',
       totalAttempts,
-      averageScore: Math.round(averageScore * 10) / 10,
-      bestScore,
+      averageScore: Math.round(averagePercentage * 10) / 10,
+      bestScore: Math.round(bestPercentage * 10) / 10,
       accuracy: Math.round(accuracy * 10) / 10,
       lastAttempt,
       attempts
@@ -104,11 +113,11 @@ export default function AdminStudentsPage() {
                   <div className="mt-2 grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <span className="text-gray-500 dark:text-gray-400">Avg Score:</span>
-                      <span className="ml-1 font-medium text-gray-900 dark:text-white">{performance?.averageScore}/{performance?.attempts[0]?.total || 2}</span>
+                      <span className="ml-1 font-medium text-gray-900 dark:text-white">{performance?.averageScore}%</span>
                     </div>
                     <div>
                       <span className="text-gray-500 dark:text-gray-400">Best Score:</span>
-                      <span className="ml-1 font-medium text-gray-900 dark:text-white">{performance?.bestScore}/{performance?.attempts[0]?.total || 2}</span>
+                      <span className="ml-1 font-medium text-gray-900 dark:text-white">{performance?.bestScore}%</span>
                     </div>
                     <div>
                       <span className="text-gray-500 dark:text-gray-400">Last Attempt:</span>
@@ -139,11 +148,11 @@ export default function AdminStudentsPage() {
               <div className="text-sm text-gray-600">Overall Accuracy</div>
             </div>
             <div className="text-center p-3 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">{studentPerformance.averageScore}</div>
+              <div className="text-2xl font-bold text-yellow-600">{studentPerformance.averageScore}%</div>
               <div className="text-sm text-gray-600">Average Score</div>
             </div>
             <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{studentPerformance.bestScore}</div>
+              <div className="text-2xl font-bold text-purple-600">{studentPerformance.bestScore}%</div>
               <div className="text-sm text-gray-600">Best Score</div>
             </div>
           </div>

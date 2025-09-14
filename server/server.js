@@ -5,6 +5,22 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
+
+// Configuration with defaults
+const config = {
+  port: process.env.PORT || 4000,
+  adminEmail: process.env.ADMIN_EMAIL || 'admin@example.com',
+  bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '10'),
+  databaseUrl: process.env.DATABASE_URL || 'postgresql://localhost:5432/iwp_database',
+  pgSsl: process.env.PGSSL === 'require' ? { rejectUnauthorized: false } : false,
+  smtp: {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    from: process.env.SMTP_FROM || process.env.SMTP_USER
+  }
+};
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
 require('dotenv').config({ override: true, path: __dirname + '/.env' });
@@ -17,8 +33,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Postgres
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.PGSSL === 'require' ? { rejectUnauthorized: false } : { rejectUnauthorized: false },
+  connectionString: config.databaseUrl,
+  ssl: config.pgSsl,
 });
 
 async function initTables() {
@@ -53,8 +69,8 @@ app.post('/auth/signup', async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'email and password required' });
-    const pwHash = await bcrypt.hash(password, 10);
-    const isAdminEmail = email.toLowerCase() === 'admin@gmail.com';
+    const pwHash = await bcrypt.hash(password, config.bcryptRounds);
+    const isAdminEmail = email.toLowerCase() === config.adminEmail.toLowerCase();
     const role = isAdminEmail ? 'admin' : 'student';
 
     // Try insert
@@ -88,7 +104,7 @@ app.post('/auth/login', async (req, res) => {
     const user = rows[0];
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
-    const effectiveRole = email.toLowerCase() === 'admin@gmail.com' ? 'admin' : user.role;
+    const effectiveRole = email.toLowerCase() === config.adminEmail.toLowerCase() ? 'admin' : user.role;
     res.json({ id: user.id, email: user.email, role: effectiveRole });
   } catch (e) {
     console.error('[login] error', e);
@@ -160,18 +176,31 @@ app.get('/attempts/search', async (req, res) => {
   }
 });
 
+// Get all users (admin only)
+app.get('/users', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'select id, email, role, created_at from users order by created_at desc'
+    );
+    res.json(rows);
+  } catch (e) {
+    console.error('[users] error', e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
 // Create reusable transporter using SMTP
 function createTransporter() {
-  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
-  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
-    throw new Error('Missing SMTP env vars. Define SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS');
+  const { host, port, user, pass } = config.smtp;
+  if (!host || !port || !user || !pass) {
+    throw new Error('Missing SMTP configuration. Please set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS environment variables');
   }
-  console.log('[mailer] using host=%s port=%s user=%s', SMTP_HOST, SMTP_PORT, SMTP_USER);
+  console.log('[mailer] using host=%s port=%s user=%s', host, port, user);
   return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT),
-    secure: Number(SMTP_PORT) === 465,
-    auth: { user: SMTP_USER, pass: SMTP_PASS },
+    host: host,
+    port: Number(port),
+    secure: Number(port) === 465,
+    auth: { user: user, pass: pass },
   });
 }
 
@@ -191,7 +220,7 @@ app.post('/send-score', async (req, res) => {
     }
 
     const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: config.smtp.from,
       to,
       subject: `Your ${testName || 'Test'} Score: ${score}/${total}`,
       html: `<div style="font-family:system-ui,Segoe UI,Arial">
@@ -210,28 +239,62 @@ app.post('/send-score', async (req, res) => {
 
 app.post('/upload-pdf', upload.single('file'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: 'No file' });
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     
     let text = '';
     let parseError = null;
+    const fileName = req.file.originalname;
+    const fileType = fileName.split('.').pop()?.toLowerCase();
     
-    try {
-      const data = await pdfParse(req.file.buffer);
-      text = data.text.replace(/\r/g, '');
-    } catch (pdfError) {
-      console.error('[upload-pdf] PDF parse failed:', pdfError.message);
-      parseError = pdfError.message;
-      
-      // Fallback: if it's a text file or simple format, try to read as text
-      if (req.file.originalname.endsWith('.txt') || req.file.mimetype === 'text/plain') {
-        text = req.file.buffer.toString('utf8');
-      } else {
-        return res.status(400).json({ 
-          error: 'PDF parsing failed. The PDF may be corrupted or password-protected.',
-          details: parseError,
-          suggestion: 'Try re-saving the PDF or converting it to a text file with the same Q&A format.'
-        });
+    console.log(`[upload-pdf] Processing file: ${fileName}, type: ${fileType}, size: ${req.file.size} bytes`);
+    
+    // Handle different file types
+    if (fileType === 'txt' || req.file.mimetype === 'text/plain') {
+      // Text file - read directly
+      text = req.file.buffer.toString('utf8');
+      console.log('[upload-pdf] Processed as text file');
+    } else if (fileType === 'pdf') {
+      // PDF file - try to parse
+      try {
+        const data = await pdfParse(req.file.buffer);
+        text = data.text.replace(/\r/g, '');
+        console.log('[upload-pdf] PDF parsed successfully');
+      } catch (pdfError) {
+        console.error('[upload-pdf] PDF parse failed:', pdfError.message);
+        parseError = pdfError.message;
+        
+        // Try alternative PDF parsing approaches
+        try {
+          // Sometimes PDFs work better with different options
+          const data = await pdfParse(req.file.buffer, {
+            max: 0, // No page limit
+            version: 'v1.10.100' // Try different version
+          });
+          text = data.text.replace(/\r/g, '');
+          console.log('[upload-pdf] PDF parsed with alternative method');
+          parseError = null; // Clear error since it worked
+        } catch (altError) {
+          console.error('[upload-pdf] Alternative PDF parsing also failed:', altError.message);
+          return res.status(400).json({ 
+            error: 'PDF parsing failed. The PDF may be corrupted, password-protected, or have structural issues.',
+            details: `Primary error: ${parseError}, Secondary error: ${altError.message}`,
+            suggestions: [
+              'Try re-saving the PDF in a different format',
+              'Convert the PDF to a text file (.txt) with the same Q&A format',
+              'Use a different PDF file',
+              'Ensure the PDF is not password-protected'
+            ],
+            supportedFormats: ['PDF', 'TXT']
+          });
+        }
       }
+    } else {
+      return res.status(400).json({ 
+        error: 'Unsupported file type',
+        details: `File type '${fileType}' is not supported`,
+        supportedFormats: ['PDF', 'TXT'],
+        suggestion: 'Please upload a PDF or TXT file'
+      });
     }
 
     if (!text.trim()) {
@@ -332,7 +395,13 @@ app.post('/upload-pdf', upload.single('file'), async (req, res) => {
       scannedBlocks: rawBlocks.length, 
       matchedBlocks: blocks.length,
       parseError: parseError,
-      textPreview: text.substring(0, 200) + (text.length > 200 ? '...' : '')
+      textPreview: text.substring(0, 200) + (text.length > 200 ? '...' : ''),
+      fileName: fileName,
+      fileType: fileType,
+      fileSize: req.file.size,
+      message: created > 0 ? 
+        `Successfully created ${created} questions from ${fileName}` : 
+        `No valid questions found in ${fileName}. Please check the format.`
     });
   } catch (e) {
     console.error('[upload-pdf]', e);
@@ -340,5 +409,4 @@ app.post('/upload-pdf', upload.single('file'), async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+app.listen(config.port, () => console.log(`Server listening on http://localhost:${config.port}`));

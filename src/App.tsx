@@ -11,6 +11,7 @@ import { DashboardLayout } from './layouts/DashboardLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import StudentProgressPage from './pages/StudentProgressPage';
 import AdminStudentsPage from './pages/AdminStudentsPage';
+import AdminUsersPage from './pages/AdminUsersPage';
 import DailyChallengePage from './pages/DailyChallengePage';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="questions" element={<AdminQuestionsPage />} />
           <Route path="upload" element={<AdminUploadPage />} />
           <Route path="students" element={<AdminStudentsPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

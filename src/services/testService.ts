@@ -1,9 +1,17 @@
+import { config } from '../config';
+
 export type Test = { id: string; title: string; numQuestions: number };
 
-let tests: Test[] = [
-  { id: 't1', title: 'Arrays & Strings Basics', numQuestions: 5 },
-  { id: 't2', title: 'Algorithms 101', numQuestions: 8 },
-];
+// Default test templates - can be overridden via environment variables
+const getDefaultTests = (): Test[] => {
+  const defaultTests = [
+    { id: 't1', title: 'Arrays & Strings Basics', numQuestions: config.DEFAULT_TEST_QUESTIONS },
+    { id: 't2', title: 'Algorithms 101', numQuestions: Math.min(config.DEFAULT_TEST_QUESTIONS + 3, config.MAX_TEST_QUESTIONS) },
+  ];
+  return defaultTests;
+};
+
+let tests: Test[] = getDefaultTests();
 
 export const testService = {
   async getTests(): Promise<Test[]> {
@@ -11,7 +19,9 @@ export const testService = {
     return tests;
   },
   async createTest(title: string, numQuestions: number): Promise<Test> {
-    const t: Test = { id: `t${Date.now()}`, title, numQuestions };
+    // Validate numQuestions against config limits
+    const validNumQuestions = Math.min(Math.max(numQuestions, 1), config.MAX_TEST_QUESTIONS);
+    const t: Test = { id: `t${Date.now()}`, title, numQuestions: validNumQuestions };
     tests = [t, ...tests];
     return t;
   },

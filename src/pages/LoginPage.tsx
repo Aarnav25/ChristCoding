@@ -3,11 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { authService } from '../services/authService';
 import { useAuthStore } from '../stores/authStore';
+import { config } from '../config';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const loginStore = useAuthStore((s) => s.login);
-  const [email, setEmail] = useState('student@example.com');
+  const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export default function LoginPage() {
     setError(null);
     try {
       const res = await authService.login(email, password);
-      const effectiveRole = res.email?.toLowerCase() === 'admin@gmail.com' ? 'admin' : (res.role || 'student');
+      const effectiveRole = res.email?.toLowerCase() === config.ADMIN_EMAIL.toLowerCase() ? 'admin' : (res.role || 'student');
       loginStore(res.email, effectiveRole as any);
       if (effectiveRole === 'admin') navigate('/questions');
       else navigate('/dashboard');

@@ -17,6 +17,7 @@ export function DashboardLayout() {
     { to: '/questions', label: 'Questions' },
     { to: '/upload', label: 'Upload PDF' },
     { to: '/students', label: 'Students' },
+    { to: '/users', label: 'All Users' },
   ];
 
   const navItems = role === 'admin' ? adminNav : studentNav;

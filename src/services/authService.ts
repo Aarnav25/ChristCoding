@@ -1,10 +1,10 @@
-export type LoginResponse = { email: string; role: 'admin' | 'student' };
+import { config } from '../config';
 
-const API = 'http://localhost:4000';
+export type LoginResponse = { email: string; role: 'admin' | 'student' };
 
 export const authService = {
   async signup(email: string, password: string) {
-    const res = await fetch(`${API}/auth/signup`, {
+    const res = await fetch(`${config.API_URL}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -13,7 +13,7 @@ export const authService = {
     return res.json();
   },
   async login(email: string, password: string) {
-    const res = await fetch(`${API}/auth/login`, {
+    const res = await fetch(`${config.API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),

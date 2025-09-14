@@ -1,3 +1,5 @@
+import { config } from '../config';
+
 export type Question = {
   id: string;
   text: string;
@@ -5,16 +7,14 @@ export type Question = {
   answerIndex: number;
 };
 
-const API = 'http://localhost:4000';
-
 export const questionService = {
   async getQuestions(): Promise<Question[]> {
-    const res = await fetch(`${API}/questions`);
+    const res = await fetch(`${config.API_URL}/questions`);
     if (!res.ok) throw new Error('Failed to load questions');
     return res.json();
   },
   async addQuestion(q: Omit<Question, 'id'>): Promise<Question> {
-    const res = await fetch(`${API}/questions`, {
+    const res = await fetch(`${config.API_URL}/questions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(q),
@@ -23,7 +23,7 @@ export const questionService = {
     return res.json();
   },
   async updateQuestion(updated: Question): Promise<Question> {
-    const res = await fetch(`${API}/questions/${updated.id}`, {
+    const res = await fetch(`${config.API_URL}/questions/${updated.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated),
@@ -32,7 +32,7 @@ export const questionService = {
     return res.json();
   },
   async deleteQuestion(id: string): Promise<void> {
-    const res = await fetch(`${API}/questions/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${config.API_URL}/questions/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete question');
   },
   async getRandomQuestions(n: number): Promise<Question[]> {
