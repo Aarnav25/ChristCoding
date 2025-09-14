@@ -9,15 +9,15 @@ export function DashboardLayout() {
   const navigate = useNavigate();
 
   const studentNav = [
-    { to: '/dashboard', label: 'Dashboard' },
-    { to: '/daily', label: config.DAILY_CHALLENGE_NAME },
-    { to: '/progress', label: 'My Progress' },
+    { to: '/student/dashboard', label: 'Dashboard' },
+    { to: '/student/daily', label: config.DAILY_CHALLENGE_NAME },
+    { to: '/student/progress', label: 'My Progress' },
   ];
   const adminNav = [
-    { to: '/questions', label: 'Questions' },
-    { to: '/upload', label: 'Upload PDF' },
-    { to: '/students', label: 'Students' },
-    { to: '/users', label: 'All Users' },
+    { to: '/admin/questions', label: 'Questions' },
+    { to: '/admin/upload', label: 'Upload PDF' },
+    { to: '/admin/students', label: 'Students' },
+    { to: '/admin/users', label: 'All Users' },
   ];
 
   const navItems = role === 'admin' ? adminNav : studentNav;
@@ -32,7 +32,7 @@ export function DashboardLayout() {
       <div className="flex">
         <aside className="w-72 bg-white/85 dark:bg-gray-800/85 backdrop-blur border-r border-gray-200 dark:border-gray-700 min-h-screen p-5 sticky top-0 transition-colors duration-300">
           <div className="flex items-center justify-between mb-8">
-            <Link to="/dashboard" className="text-2xl font-extrabold tracking-tight">
+            <Link to={role === 'admin' ? '/admin/questions' : '/student/dashboard'} className="text-2xl font-extrabold tracking-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-fuchsia-600">{config.APP_NAME}</span>
             </Link>
             <DarkModeToggle />

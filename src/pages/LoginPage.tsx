@@ -20,8 +20,8 @@ export default function LoginPage() {
       const res = await authService.login(email, password);
       const effectiveRole = res.email?.toLowerCase() === config.ADMIN_EMAIL.toLowerCase() ? 'admin' : (res.role || 'student');
       loginStore(res.email, effectiveRole as any);
-      if (effectiveRole === 'admin') navigate('/questions');
-      else navigate('/dashboard');
+      if (effectiveRole === 'admin') navigate('/admin/questions');
+      else navigate('/student/dashboard');
     } catch (e: any) {
       console.error('login failed', e);
       setError(e?.message || 'Login failed');

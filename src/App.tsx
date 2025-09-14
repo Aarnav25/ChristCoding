@@ -34,27 +34,27 @@ export default function App() {
     <DarkModeProvider>
       <BrowserRouter>
         <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
 
-        <Route path="/" element={<StudentShell />}> 
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<StudentDashboard />} />
-          <Route path="daily" element={<DailyChallengePage />} />
-          <Route path="tests/:testId" element={<StudentTestPage />} />
-          <Route path="progress" element={<StudentProgressPage />} />
-        </Route>
+          <Route path="/student" element={<StudentShell />}> 
+            <Route index element={<Navigate to="/student/dashboard" replace />} />
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="daily" element={<DailyChallengePage />} />
+            <Route path="tests/:testId" element={<StudentTestPage />} />
+            <Route path="progress" element={<StudentProgressPage />} />
+          </Route>
 
-        <Route path="/" element={<AdminShell />}> 
-          <Route index element={<Navigate to="/questions" replace />} />
-          <Route path="questions" element={<AdminQuestionsPage />} />
-          <Route path="upload" element={<AdminUploadPage />} />
-          <Route path="students" element={<AdminStudentsPage />} />
-          <Route path="users" element={<AdminUsersPage />} />
-        </Route>
+          <Route path="/admin" element={<AdminShell />}> 
+            <Route index element={<Navigate to="/admin/questions" replace />} />
+            <Route path="questions" element={<AdminQuestionsPage />} />
+            <Route path="upload" element={<AdminUploadPage />} />
+            <Route path="students" element={<AdminStudentsPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </DarkModeProvider>

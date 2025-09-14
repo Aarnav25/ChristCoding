@@ -43,7 +43,7 @@ export default function StudentDashboard() {
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Welcome{email ? `, ${email.split('@')[0]}` : ''}</h2>
           <p className="text-gray-600 dark:text-gray-400">Kick off your learning with today's {config.DAILY_CHALLENGE_NAME}.</p>
         </div>
-        <Link to="/daily" className="rounded-xl px-4 py-2 font-medium text-white bg-gradient-to-r from-blue-600 to-fuchsia-600 hover:from-blue-700 hover:to-fuchsia-700 transition-all">Start {config.DAILY_CHALLENGE_NAME}</Link>
+        <Link to="/student/daily" className="rounded-xl px-4 py-2 font-medium text-white bg-gradient-to-r from-blue-600 to-fuchsia-600 hover:from-blue-700 hover:to-fuchsia-700 transition-all">Start {config.DAILY_CHALLENGE_NAME}</Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
