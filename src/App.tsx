@@ -1,10 +1,8 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import StudentDashboard from './pages/StudentDashboard';
 import StudentTestPage from './pages/StudentTestPage';
-import AdminDashboard from './pages/AdminDashboard';
 import AdminQuestionsPage from './pages/AdminQuestionsPage';
 import AdminUploadPage from './pages/AdminUploadPage';
 import { DashboardLayout } from './layouts/DashboardLayout';

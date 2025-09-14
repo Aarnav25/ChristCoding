@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { questionService } from '../services/questionService';
 import type { Question } from '../services/questionService';
 import { Card } from '../components/Card';
-import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
 import { testService } from '../services/testService';
 import { progressService } from '../services/progressService';

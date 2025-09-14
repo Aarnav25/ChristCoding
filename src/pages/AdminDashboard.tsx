@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '../components/Card';
-import { Button } from '../components/Button';
 import { questionService } from '../services/questionService';
 import type { Question } from '../services/questionService';
 import { testService } from '../services/testService';

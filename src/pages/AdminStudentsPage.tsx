@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '../components/Card';
 import { progressService } from '../services/progressService';
 
@@ -34,35 +34,59 @@ export default function AdminStudentsPage() {
     return () => clearTimeout(id);
   }, [q]);
 
-  const calculatePerformance = (attempts: any[]) => {
+  const calculatePerformance = (attempts: any[]): StudentPerformance | null => {
     if (attempts.length === 0) return null;
 
-    const totalAttempts = attempts.length;
+    console.log('Calculating performance for attempts:', attempts);
+
+    // Filter out invalid attempts (where total is 0 or score is negative)
+    const validAttempts = attempts.filter(attempt => 
+      attempt.total > 0 && attempt.score >= 0
+    );
+
+    console.log('Valid attempts:', validAttempts);
+
+    if (validAttempts.length === 0) {
+      return {
+        email: attempts[0]?.student_email || '',
+        totalAttempts: attempts.length,
+        averageScore: 0,
+        bestScore: 0,
+        accuracy: 0,
+        lastAttempt: attempts[0]?.taken_at || '',
+        attempts
+      };
+    }
+
+    const totalAttempts = validAttempts.length;
     
     // Calculate average percentage score (not raw score)
-    const averagePercentage = attempts.reduce((sum, attempt) => {
+    const averagePercentage = validAttempts.reduce((sum, attempt) => {
       return sum + (attempt.score / attempt.total) * 100;
     }, 0) / totalAttempts;
     
     // Calculate best percentage score
-    const bestPercentage = Math.max(...attempts.map(a => (a.score / a.total) * 100));
+    const bestPercentage = Math.max(...validAttempts.map(a => (a.score / a.total) * 100));
     
     // Calculate overall accuracy (total correct / total possible)
-    const totalScore = attempts.reduce((sum, attempt) => sum + attempt.score, 0);
-    const totalPossible = attempts.reduce((sum, attempt) => sum + attempt.total, 0);
+    const totalScore = validAttempts.reduce((sum, attempt) => sum + attempt.score, 0);
+    const totalPossible = validAttempts.reduce((sum, attempt) => sum + attempt.total, 0);
     const accuracy = totalPossible > 0 ? (totalScore / totalPossible) * 100 : 0;
     
     const lastAttempt = attempts[0]?.taken_at || '';
 
-    return {
+    const result = {
       email: attempts[0]?.student_email || '',
-      totalAttempts,
+      totalAttempts: attempts.length, // Show total attempts including invalid ones
       averageScore: Math.round(averagePercentage * 10) / 10,
       bestScore: Math.round(bestPercentage * 10) / 10,
       accuracy: Math.round(accuracy * 10) / 10,
       lastAttempt,
       attempts
     };
+
+    console.log('Performance calculation result:', result);
+    return result;
   };
 
   const handleStudentClick = (email: string) => {
@@ -97,13 +121,13 @@ export default function AdminStudentsPage() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Students Found:</h3>
             {Object.entries(studentGroups).map(([email, attempts]) => {
-              const performance = calculatePerformance(attempts);
+              const performance = calculatePerformance(attempts as any[]);
               return (
                 <div key={email} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors" onClick={() => handleStudentClick(email)}>
                   <div className="flex justify-between items-center">
                     <div>
                       <h4 className="font-medium text-blue-600 dark:text-blue-400">{email}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{attempts.length} attempt(s)</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{(attempts as any[]).length} attempt(s)</p>
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold text-green-600 dark:text-green-400">{performance?.accuracy}%</div>
