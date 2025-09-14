@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "@vite_api_url",
+    "VITE_APP_NAME": "@vite_app_name",
+    "VITE_ADMIN_EMAIL": "@vite_admin_email",
+    "VITE_DEFAULT_STUDENT_EMAIL": "@vite_default_student_email",
+    "VITE_DAILY_CHALLENGE_NAME": "@vite_daily_challenge_name",
+    "VITE_DEFAULT_TEST_TITLE": "@vite_default_test_title",
+    "VITE_DEFAULT_TEST_QUESTIONS": "@vite_default_test_questions",
+    "VITE_MAX_TEST_QUESTIONS": "@vite_max_test_questions",
+    "VITE_DEFAULT_QUESTIONS_PER_PAGE": "@vite_default_questions_per_page",
+    "VITE_MAX_QUESTIONS_PER_PAGE": "@vite_max_questions_per_page"
+  }
+}

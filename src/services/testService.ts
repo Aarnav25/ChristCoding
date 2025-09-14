@@ -5,7 +5,7 @@ export type Test = { id: string; title: string; numQuestions: number };
 // Default test templates - can be overridden via environment variables
 const getDefaultTests = (): Test[] => {
   const defaultTests = [
-    { id: 't1', title: 'Arrays & Strings Basics', numQuestions: config.DEFAULT_TEST_QUESTIONS },
+    { id: 't1', title: config.DEFAULT_TEST_TITLE, numQuestions: config.DEFAULT_TEST_QUESTIONS },
     { id: 't2', title: 'Algorithms 101', numQuestions: Math.min(config.DEFAULT_TEST_QUESTIONS + 3, config.MAX_TEST_QUESTIONS) },
   ];
   return defaultTests;

@@ -6,9 +6,10 @@ import type { Question } from '../services/questionService';
 import { Modal } from '../components/Modal';
 import { progressService } from '../services/progressService';
 import { useAuthStore } from '../stores/authStore';
+import { config } from '../config';
 
 export default function DailyChallengePage() {
-  const email = useAuthStore((s) => s.email) ?? 'student@example.com';
+  const email = useAuthStore((s) => s.email) ?? config.DEFAULT_STUDENT_EMAIL;
   const [qs, setQs] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, number | null>>({});
   const [open, setOpen] = useState(false);
@@ -33,10 +34,10 @@ export default function DailyChallengePage() {
     setOpen(true);
     await progressService.recordAttempt({ studentEmail: email, testId: 'daily', score: s, total: qs.length });
     try {
-      await fetch('http://localhost:4000/send-score', {
+      await fetch(`${config.API_URL}/send-score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: email, testName: 'Daily Challenge', score: s, total: qs.length }),
+        body: JSON.stringify({ to: email, testName: config.DAILY_CHALLENGE_NAME, score: s, total: qs.length }),
       });
     } catch (err) {
       console.error('Email send failed', err);
@@ -46,7 +47,7 @@ export default function DailyChallengePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-fuchsia-600">Daily Challenge</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-fuchsia-600">{config.DAILY_CHALLENGE_NAME}</h2>
       </div>
       <form onSubmit={submit} className="space-y-4">
         {qs.map((q, idx) => (

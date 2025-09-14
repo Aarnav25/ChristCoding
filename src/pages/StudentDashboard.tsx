@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { progressService } from '../services/progressService';
 import { useAuthStore } from '../stores/authStore';
+import { config } from '../config';
 
 export default function StudentDashboard() {
   const email = useAuthStore((s) => s.email) ?? '';
@@ -40,9 +41,9 @@ export default function StudentDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Welcome{email ? `, ${email.split('@')[0]}` : ''}</h2>
-          <p className="text-gray-600 dark:text-gray-400">Kick off your learning with today's Daily Challenge.</p>
+          <p className="text-gray-600 dark:text-gray-400">Kick off your learning with today's {config.DAILY_CHALLENGE_NAME}.</p>
         </div>
-        <Link to="/daily" className="rounded-xl px-4 py-2 font-medium text-white bg-gradient-to-r from-blue-600 to-fuchsia-600 hover:from-blue-700 hover:to-fuchsia-700 transition-all">Start Daily Challenge</Link>
+        <Link to="/daily" className="rounded-xl px-4 py-2 font-medium text-white bg-gradient-to-r from-blue-600 to-fuchsia-600 hover:from-blue-700 hover:to-fuchsia-700 transition-all">Start {config.DAILY_CHALLENGE_NAME}</Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -84,7 +85,7 @@ export default function StudentDashboard() {
               ))}
               {recent.length === 0 && (
                 <tr>
-                  <td className="px-2 py-6 text-gray-500 dark:text-gray-400" colSpan={3}>No attempts yet. Take your first Daily Challenge!</td>
+                  <td className="px-2 py-6 text-gray-500 dark:text-gray-400" colSpan={3}>No attempts yet. Take your first {config.DAILY_CHALLENGE_NAME}!</td>
                 </tr>
               )}
             </tbody>

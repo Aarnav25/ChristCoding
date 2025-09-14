@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Card } from '../components/Card';
+import { config } from '../config';
 
 export default function AdminUploadPage() {
   const [uploading, setUploading] = useState(false);
@@ -15,7 +16,7 @@ export default function AdminUploadPage() {
     formData.append('file', file);
     
     try {
-      const res = await fetch('http://localhost:4000/upload-pdf', { 
+      const res = await fetch(`${config.API_URL}/upload-pdf`, { 
         method: 'POST', 
         body: formData 
       });

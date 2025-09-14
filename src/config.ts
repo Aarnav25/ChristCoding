@@ -9,6 +9,7 @@ export const config = {
   
   // Admin Configuration
   ADMIN_EMAIL: import.meta.env.VITE_ADMIN_EMAIL || 'admin@example.com',
+  DEFAULT_STUDENT_EMAIL: import.meta.env.VITE_DEFAULT_STUDENT_EMAIL || 'student@example.com',
   
   // Test Configuration
   DEFAULT_TEST_QUESTIONS: parseInt(import.meta.env.VITE_DEFAULT_TEST_QUESTIONS || '5'),
@@ -16,5 +17,9 @@ export const config = {
   
   // UI Configuration
   DEFAULT_QUESTIONS_PER_PAGE: parseInt(import.meta.env.VITE_DEFAULT_QUESTIONS_PER_PAGE || '10'),
-  MAX_QUESTIONS_PER_PAGE: parseInt(import.meta.env.VITE_MAX_QUESTIONS_PER_PAGE || '50')
+  MAX_QUESTIONS_PER_PAGE: parseInt(import.meta.env.VITE_MAX_QUESTIONS_PER_PAGE || '50'),
+  
+  // Text Configuration
+  DAILY_CHALLENGE_NAME: import.meta.env.VITE_DAILY_CHALLENGE_NAME || 'Daily Challenge',
+  DEFAULT_TEST_TITLE: import.meta.env.VITE_DEFAULT_TEST_TITLE || 'Arrays & Strings Basics'
 };

@@ -7,10 +7,11 @@ import { Modal } from '../components/Modal';
 import { testService } from '../services/testService';
 import { progressService } from '../services/progressService';
 import { useAuthStore } from '../stores/authStore';
+import { config } from '../config';
 
 export default function StudentTestPage() {
   const { testId } = useParams();
-  const email = useAuthStore((s) => s.email) ?? 'student@example.com';
+  const email = useAuthStore((s) => s.email) ?? config.DEFAULT_STUDENT_EMAIL;
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, number | null>>({});
   const [open, setOpen] = useState(false);
@@ -47,7 +48,7 @@ export default function StudentTestPage() {
     await progressService.recordAttempt({ studentEmail: email, testId: testId ?? 'unknown', score: s, total: questions.length });
     // Send score email via local server
     try {
-      await fetch('http://localhost:4000/send-score', {
+      await fetch(`${config.API_URL}/send-score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: email, testName: title, score: s, total: questions.length }),

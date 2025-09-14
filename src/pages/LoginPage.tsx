@@ -8,7 +8,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const loginStore = useAuthStore((s) => s.login);
   const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('password');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +44,7 @@ export default function LoginPage() {
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100 animate-pulse mb-4">
                   <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                  Daily Challenges
+                  {config.DAILY_CHALLENGE_NAME}s
                 </div>
                 <h2 className="text-3xl font-extrabold tracking-tight mb-3"><span className="text-blue-600">Daily</span> Coding Challenge</h2>
                 <p className="text-gray-600">Sharpen your skills with curated questions, mock tests, and instant scoring. Track progress and compete with your peers.</p>

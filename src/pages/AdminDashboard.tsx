@@ -4,6 +4,7 @@ import { questionService } from '../services/questionService';
 import type { Question } from '../services/questionService';
 import { testService } from '../services/testService';
 import type { Test } from '../services/testService';
+import { config } from '../config';
 
 export default function AdminDashboard() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -23,7 +24,7 @@ export default function AdminDashboard() {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const res = await fetch('http://localhost:4000/upload-pdf', { method: 'POST', body: formData });
+      const res = await fetch(`${config.API_URL}/upload-pdf`, { method: 'POST', body: formData });
       const json = await res.json();
       if (!res.ok) {
         alert(json?.error || 'Upload failed');
